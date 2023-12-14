@@ -1,0 +1,8 @@
+version: "3.3"
+services:
+  app:
+    restart: always
+    volumes:
+      - /mnt/sata2-1/app/frp2frp_xinech_tech/frpc.toml:/etc/frp/frpc.toml
+    image: snowdreamtech/frpc:latest
+    network_mode: host

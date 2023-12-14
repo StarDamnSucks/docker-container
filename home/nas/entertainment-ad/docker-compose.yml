@@ -1,0 +1,68 @@
+version: "3.5"
+services:
+  jallyfin:
+    image: jellyfin/jellyfin:latest
+    user: 568:568
+    volumes:
+      - /mnt/storage/apps/jallyfin/config:/config
+      - /mnt/storage/apps/jallyfin/cache:/cache
+      - /mnt/storage/video/jav/output:/media
+    restart: "unless-stopped"
+    dns:
+      - 8.8.8.8
+    ports:
+      - 31010:8096
+    network_mode: bridge
+    deploy:
+      resources:
+        limits:
+          cpus: "0.50"
+          memory: 4096M
+
+  mdc:
+    image: vergilgao/mdc:latest
+    user: 0:0
+    dns:
+      - 8.8.8.8
+    volumes:
+      - /mnt/storage/apps/mdc/config:/config
+      - /mnt/storage/video/jav:/data
+    restart: "no"
+    environment:
+      - TZ=Asia/Shanghai
+    network_mode: bridge
+
+  metatube:
+    image: metatube/metatube-server:latest
+    user: 0:0
+    ports:
+      - 31011:8080
+    restart: unless-stopped
+    depends_on:
+      - postgres
+    environment:
+      - HTTP_PROXY=
+      - HTTPS_PROXY=
+    volumes:
+      - run:/var/run
+    command: -dsn "postgres://metatube:metatube@/metatube?host=/var/run/postgresql" -port 8080 -db-auto-migrate -db-prepared-stmt
+    network_mode: bridge
+
+  postgres:
+    image: postgres:15-alpine
+    restart: unless-stopped
+    user: 0:0
+    environment:
+      - POSTGRES_USER=metatube
+      - POSTGRES_PASSWORD=metatube
+      - POSTGRES_DB=metatube
+    volumes:
+      - postgresql:/var/lib/postgresql/data
+      - run:/var/run
+    command: "-c TimeZone=Asia/Shanghai -c log_timezone=Asia/Shanghai -c listen_addresses='' -c unix_socket_permissions=0777"
+    network_mode: bridge
+
+volumes:
+  run:
+  postgresql:
+    driver: local

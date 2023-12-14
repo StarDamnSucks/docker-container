@@ -1,0 +1,32 @@
+version: "3.5"
+services:
+  jallyfin:
+    image: jellyfin/jellyfin:latest
+    user: 0:0
+    volumes:
+      - /mnt/sata2-1/app/jallyfin/config:/config
+      - /mnt/sata2-1/app/jallyfin/cache:/cache
+      - /mnt/sata2-1/app/mdc/media/output:/media
+    restart: "unless-stopped"
+    # Optional - alternative address used for autodiscovery
+
+    ports:
+      - 31010:8096
+    network_mode: bridge
+    # Optional - may be necessary for docker healthcheck to pass if running in host network mode
+    deploy:
+      resources:
+        limits:
+          cpus: "0.50"
+          memory: 4096M
+
+  mdc:
+    image: vergilgao/mdc:latest
+    user: 0:0
+    volumes:
+      - /mnt/sata2-1/app/mdc/config:/config
+      - /mnt/sata2-1/app/mdc/media:/data
+    restart: "no"
+    environment:
+      - TZ=Asia/Shanghai
+    network_mode: bridge

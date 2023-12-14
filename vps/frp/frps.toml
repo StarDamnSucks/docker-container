@@ -1,0 +1,13 @@
+bindPort = 7000
+vhostHTTPPort = 8080
+vhostHTTPSPort = 8081
+
+log.level = "debug"
+
+webServer.port = 7500
+webServer.user = "admin"
+webServer.password = "oXrjDeWiRZ3cYN"
+webServer.addr = "0.0.0.0"
+
+auth.method = "token"
+auth.token = "8zLfi4k7DZh6QS"

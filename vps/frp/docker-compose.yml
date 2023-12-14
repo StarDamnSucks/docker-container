@@ -1,0 +1,8 @@
+version: "3.3"
+services:
+  frps:
+    restart: always
+    volumes:
+      - /docker/frp/frps.toml:/etc/frp/frps.toml
+    image: snowdreamtech/frps
+    network_mode: host

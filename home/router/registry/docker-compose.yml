@@ -1,0 +1,35 @@
+version: "3.8"
+
+services:
+  webui:
+    image: joxit/docker-registry-ui:main
+    restart: always
+    ports:
+      - 30000:80
+    environment:
+      - SINGLE_REGISTRY=true
+      - REGISTRY_TITLE=Docker Registry UI
+      - DELETE_IMAGES=true
+      - SHOW_CONTENT_DIGEST=true
+      - NGINX_PROXY_PASS_URL=http://172.17.0.1:30001
+      - SHOW_CATALOG_NB_TAGS=true
+      - CATALOG_MIN_BRANCHES=1
+      - CATALOG_MAX_BRANCHES=1
+      - TAGLIST_PAGE_SIZE=100
+      - REGISTRY_SECURED=false
+      - CATALOG_ELEMENTS_LIMIT=1000
+      - TZ=Asia/Shanghai
+
+  server:
+    image: registry:2
+    restart: always
+    ports:
+      - "30001:5000"
+    environment:
+      REGISTRY_AUTH: htpasswd
+      REGISTRY_AUTH_HTPASSWD_REALM: Registry
+      REGISTRY_AUTH_HTPASSWD_PATH: /auth/htpasswd
+      REGISTRY_STORAGE_DELETE_ENABLED: "true"
+    volumes:
+      - /mnt/sata2-1/app/registry/auth:/auth
+      - /mnt/sata2-1/app/registry/data:/var/lib/registry

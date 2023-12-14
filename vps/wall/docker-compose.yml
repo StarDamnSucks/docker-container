@@ -1,0 +1,10 @@
+version: "3.9"
+services:
+  xui:
+    image: enwaiax/x-ui
+    volumes:
+      - /docker/xui/db/:/etc/x-ui/
+      - /etc/letsencrypt/:/etc/letsencrypt
+    restart: unless-stopped
+    network_mode: host
+    privileged: true

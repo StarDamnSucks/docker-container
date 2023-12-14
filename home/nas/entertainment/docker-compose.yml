@@ -1,0 +1,79 @@
+version: "3"
+services:
+  chinesesubfinder:
+    image: allanpk716/chinesesubfinder:latest
+    volumes:
+      - /mnt/storage/apps/chinesesubfinder/config:/config # 冒号左边请修改为你想在主机上保存配置、日志等文件的路径
+      - /mnt/storage/media:/media # 请修改为你的媒体目录，冒号右边可以改成你方便记忆的目录，多个媒体目录需要分别映射进来
+      - /mnt/storage/apps/chinesesubfinder/browser:/root/.cache/rod/browser # 容器重启后无需再次下载 chrome，除非 go-rod 更新
+    environment:
+      - PUID=568
+      - PGID=568
+      - PERMS=false # 是否重设/media权限
+      - TZ=Asia/Shanghai # 时区
+    restart: unless-stopped
+    network_mode: bridge
+    hostname: chinesesubfinder
+    ports:
+      - 31021:19035 # 从0.20.0版本开始，通过webui来设置
+      - 31022:19037 # webui 的视频列表读取图片用，务必设置不要暴露到外网
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m" # 限制docker控制台日志大小，可自行调整
+
+  # jackett:
+  #   image: lscr.io/linuxserver/jackett:latest
+  #   environment:
+  #     - PUID=568
+  #     - PGID=568
+  #     - UMASK=022 # 权限掩码
+  #     - TZ=Asia/Shanghai
+  #     - AUTO_UPDATE=true #optional
+  #     - RUN_OPTS= #optional
+  #   volumes:
+  #     - /mnt/storage/apps/jackett/data:/config
+  #     - /mnt/storage/downloads/watch:/downloads
+  #   ports:
+  #     - 31023:9117
+  #   restart: unless-stopped
+
+  jellyfin:
+    image: jellyfin/jellyfin
+    network_mode: bridge
+    volumes:
+      - /mnt/storage/apps/jellyfin/config:/config
+      - /mnt/storage/apps/jellyfin:/cache
+      - /mnt/storage/media:/media
+    restart: "unless-stopped"
+    ports:
+      - 31020:8096
+    environment:
+      - PUID=568
+      - PGID=568
+      - JELLYFIN_PublishedServerUrl=http://jellyfin.home.stardamnsucks.com
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  nastools:
+    image: 19970688/nastools-bt:latest
+    ports:
+      - 31025:3000
+    volumes:
+      - /mnt/storage/apps/nastools/config:/config # 冒号左边请修改为你想保存配置的路径
+      - /mnt/storage/apps/nastools/rclone:/root/.config/rclone # 冒号左边请修改为你想保存配置的路径
+      - /mnt/storage/downloads:/home/downloads # 映射数据目录
+      - /mnt/storage/media/movie:/movie # 映射数据目录
+      - /mnt/storage/media/anime:/anime # 映射数据目录
+      - /mnt/storage/media/tv:/tv # 映射数据目录
+      - /mnt/storage/media:/mnt/storage/media
+      - /mnt/storage/downloads:/mnt/storage/downloads
+    environment:
+      - PUID=568
+      - PGID=568
+      - TZ=Asia/Shanghai
+      - NASTOOL_AUTO_UPDATE=false # 如需在启动容器时自动升级程程序请设置为true
+      - NASTOOL_CN_UPDATE=false # 如果开启了容器启动自动升级程序，并且网络不太友好时，可以设置为true，会使用国内源进行软件更新
+    restart: always
+    network_mode: bridge
+    hostname: nastools

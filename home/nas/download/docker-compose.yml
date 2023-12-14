@@ -1,0 +1,33 @@
+services:
+  xunlei:
+    image: cnk3x/xunlei:latest
+    network_mode: bridge
+    environment:
+      - PUID=568
+      - PGID=568
+      - UMASK=022 # 权限掩码
+    hostname: nas
+    ports:
+      - 32011:2345
+    volumes:
+      - /mnt/storage/apps/xunlei:/xunlei/data
+      - /mnt/storage/video:/xunlei/downloads
+    restart: unless-stopped
+
+  qbittorrent:
+    image: linuxserver/qbittorrent:latest
+    network_mode: bridge
+    environment:
+      - PUID=568
+      - PGID=568
+      - UMASK=022 # 权限掩码
+      - TZ=Asia/Shanghai
+      - WEBUI_PORT=32010
+    volumes:
+      - /mnt/storage/apps/qbittorrent/config:/config
+      - /mnt/storage/downloads:/downloads
+    ports:
+      - 32010:32010
+      - 6881:6881
+      - 6881:6881/udp
+    restart: unless-stopped

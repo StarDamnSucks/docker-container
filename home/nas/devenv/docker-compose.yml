@@ -1,0 +1,31 @@
+version: "3.6"
+services:
+  gitlab-ce:
+    image: "gitlab/gitlab-ce:16.5.1-ce.0"
+    restart: always
+    hostname: "gitlab"
+    environment:
+      - PUID=568
+      - PGID=568
+      - UMASK=022 # 权限掩码
+      #GITLAB_OMNIBUS_CONFIG: |
+        ## GitLab instance
+       # external_url "https://gitlab.vps.xinech.tech"         # Must use https protocol
+        #letsencrypt['contact_emails'] = ['stardamnsucks@gemail.com'] # Optional
+        ## Container Registry (optional), must use https protocol
+        #registry_external_url "https://gitlab.vps.xinech.tech"
+        #nginx['redirect_http_to_https'] = true
+        # Add any other gitlab.rb configuration here, each on its own line
+    ports:
+      - "30101:30101"
+      - "30102:443"
+      - "30103:22"
+    volumes:
+      - "/mnt/storage/apps/gitlab-ce/config:/etc/gitlab"
+      - "/mnt/storage/apps/gitlab-ce/logs:/var/log/gitlab"
+      - "/mnt/storage/apps/gitlab-ce/data:/var/opt/gitlab"
+    shm_size: "256m"
+    deploy:
+      resources:
+        limits:
+          memory: 8192M
